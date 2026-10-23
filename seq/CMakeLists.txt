@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.15)
+project(seq CXX)
+set(CMAKE_CXX_STANDARD 17)
+add_library(seqengine Engine.cpp)
+add_executable(engine_tests EngineTests.cpp)
+target_link_libraries(engine_tests seqengine)
+enable_testing()
+add_test(NAME engine_tests COMMAND engine_tests)
