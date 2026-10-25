@@ -210,6 +210,9 @@ public:
 
     void mouseDown(const juce::MouseEvent&) override { grabKeyboardFocus(); }
 
+    // Quit (Cmd-Q or the close button): offer to save unsaved changes first.
+    void requestQuit() { confirmDiscard([] { juce::JUCEApplication::getInstance()->quit(); }); }
+
 private:
     // Declaration order matters: the MIDI host (audio callback) must be destroyed before the engine it drives.
     seq::Engine engine;
@@ -370,7 +373,12 @@ public:
         window = std::make_unique<MainWindow>(getApplicationName());
     }
     void shutdown() override { window.reset(); }
-    void systemRequestedQuit() override { quit(); }
+    void systemRequestedQuit() override
+    {
+        if (window != nullptr)
+            if (auto* main = dynamic_cast<MainComponent*>(window->getContentComponent())) { main->requestQuit(); return; }
+        quit();
+    }
 
 private:
     class MainWindow : public juce::DocumentWindow
