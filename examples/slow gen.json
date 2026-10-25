@@ -1,0 +1,353 @@
+{
+  "format": "seq-preset",
+  "version": 1,
+  "bpm": 30.0,
+  "patch": {
+    "mode": 3,
+    "gate": 0.9,
+    "quantizeTicks": 0,
+    "melody": {
+      "channel": 1,
+      "octave": 0,
+      "velocity": 100,
+      "axis": 60,
+      "eatNote": false,
+      "invertBeforeTranspose": true,
+      "notes": [
+        [
+          60
+        ]
+      ],
+      "intNotes": [
+        [
+          1
+        ]
+      ],
+      "order": [
+        [
+          1,
+          2
+        ]
+      ],
+      "rests": [
+        [
+          0
+        ]
+      ],
+      "transpose": [
+        [
+          0,
+          2,
+          2
+        ]
+      ],
+      "inverse": [
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "change": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      },
+      "rhythm": {
+        "rows": [
+          [
+            1,
+            1,
+            2,
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 8,
+          "mod": 2
+        }
+      },
+      "transposeRhythm": {
+        "rows": [
+          [
+            1,
+            2
+          ]
+        ],
+        "unit": {
+          "denom": 8,
+          "mod": 0
+        }
+      },
+      "inverseRhythm": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 8,
+          "mod": 0
+        }
+      }
+    },
+    "harmony": {
+      "channel": 2,
+      "octave": 0,
+      "velocity": 100,
+      "axis": 60,
+      "eatNote": false,
+      "invertBeforeTranspose": true,
+      "notes": [
+        [
+          60,
+          64,
+          67
+        ],
+        [
+          62,
+          64,
+          67
+        ]
+      ],
+      "intNotes": [
+        [
+          0
+        ]
+      ],
+      "order": [
+        [
+          1,
+          2
+        ]
+      ],
+      "rests": [
+        [
+          0
+        ]
+      ],
+      "transpose": [
+        [
+          0,
+          4
+        ]
+      ],
+      "inverse": [
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "change": {
+        "rows": [
+          [
+            3
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      },
+      "rhythm": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      },
+      "transposeRhythm": {
+        "rows": [
+          [
+            1,
+            2,
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      },
+      "inverseRhythm": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      }
+    },
+    "bass": {
+      "channel": 3,
+      "octave": -24,
+      "velocity": 100,
+      "axis": 60,
+      "eatNote": false,
+      "invertBeforeTranspose": true,
+      "notes": [
+        [
+          36
+        ]
+      ],
+      "intNotes": [
+        [
+          1
+        ]
+      ],
+      "order": [
+        [
+          1
+        ]
+      ],
+      "rests": [
+        [
+          0
+        ]
+      ],
+      "transpose": [
+        [
+          0
+        ]
+      ],
+      "inverse": [
+        [
+          0
+        ]
+      ],
+      "change": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      },
+      "rhythm": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 8,
+          "mod": 0
+        }
+      },
+      "transposeRhythm": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      },
+      "inverseRhythm": {
+        "rows": [
+          [
+            1
+          ]
+        ],
+        "unit": {
+          "denom": 4,
+          "mod": 0
+        }
+      }
+    },
+    "percussion": {
+      "channel": 10,
+      "velocity": 100,
+      "tempo": 0,
+      "gate": {
+        "denom": 16,
+        "mod": 0
+      },
+      "parts": [
+        {
+          "note": 36,
+          "unit": {
+            "denom": 8,
+            "mod": 0
+          },
+          "steps": [
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "note": 46,
+          "unit": {
+            "denom": 8,
+            "mod": 0
+          },
+          "steps": [
+            0,
+            1
+          ]
+        },
+        {
+          "note": 57,
+          "unit": {
+            "denom": 8,
+            "mod": 0
+          },
+          "steps": [
+            1
+          ]
+        },
+        {
+          "note": 38,
+          "unit": {
+            "denom": 4,
+            "mod": 0
+          },
+          "steps": [
+            0
+          ]
+        },
+        {
+          "note": 44,
+          "unit": {
+            "denom": 4,
+            "mod": 0
+          },
+          "steps": [
+            0
+          ]
+        },
+        {
+          "note": 46,
+          "unit": {
+            "denom": 4,
+            "mod": 0
+          },
+          "steps": [
+            0
+          ]
+        }
+      ]
+    }
+  }
+}
