@@ -13,7 +13,13 @@ public:
     {
         current = seq::makeDefaultPatch();
         publish(false);
+        markClean();
     }
+
+    // "Unsaved changes" tracking: every published edit (including undo/redo) bumps the version.
+    bool isDirty() const { return version != cleanVersion; }
+    void markClean() { cleanVersion = version; }
+    void touch() { ++version; }   // for state that lives outside the patch but is saved with it (BPM)
 
     const seq::Patch& get() const { return current; }
     seq::Patch& peek() { return current; }   // read access for widgets that need non-const module refs. Do not edit through this.
@@ -62,6 +68,7 @@ public:
 private:
     void publish(bool notify = true)
     {
+        ++version;
         current.finalize();
         engine.post(new seq::Patch(current));
         if (notify) sendChangeMessage();
@@ -72,4 +79,5 @@ private:
     std::vector<seq::Patch> undoStack, redoStack;
     juce::String lastKey;
     double lastTime = 0.0;
+    unsigned long version = 0, cleanVersion = 0;
 };

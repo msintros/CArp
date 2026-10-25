@@ -218,7 +218,9 @@ public:
                     const int n = std::max(1, spec.autoCount(p));
                     std::vector<int> row;
                     for (int i = 1; i <= n; ++i) row.push_back(i);
-                    getMod(p).rows.push_back(row);
+                    auto& rows = getMod(p).rows;
+                    if (!rows.empty() && rows.back().size() == 1) rows.back() = row;   // a lone element is a placeholder: replace it
+                    else rows.push_back(row);
                 });
             });
         rebuild();

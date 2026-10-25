@@ -4,6 +4,7 @@
 #include "LinePage.h"
 #include "PercussionPage.h"
 #include "PresetIO.h"
+#include <BinaryData.h>
 
 // ------------------------------------------------------------------------------------------ tab bar
 class TabBar : public juce::Component
@@ -66,10 +67,7 @@ public:
 
         // presets bar
         for (auto* b : { &newBtn, &saveBtn, &loadBtn, &undoBtn, &redoBtn }) addAndMakeVisible(*b);
-        newBtn.onClick  = [this] {
-            store.modify("", [](seq::Patch& p) { p = seq::makeDefaultPatch(); });   // undoable
-            bpmSlider.setValue(120.0);
-        };
+        newBtn.onClick  = [this] { newPreset(); };
         saveBtn.onClick = [this] { savePreset(); };
         loadBtn.onClick = [this] { loadPreset(); };
         undoBtn.onClick = [this] { store.undo(); };
@@ -98,7 +96,7 @@ public:
         bpmSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 50, 24);
         bpmSlider.setRange(20.0, 300.0, 1.0);
         bpmSlider.setValue(120.0, juce::dontSendNotification);
-        bpmSlider.onValueChange = [this] { bpm.store(bpmSlider.getValue()); };
+        bpmSlider.onValueChange = [this] { bpm.store(bpmSlider.getValue()); store.touch(); };
         addAndMakeVisible(bpmSlider);
 
         addAndMakeVisible(editsLabel); editsLabel.setText("Edits apply", juce::dontSendNotification);
@@ -143,12 +141,25 @@ public:
         g.fillAll(juce::Colour(0xfffafafa));
         g.setColour(juce::Colour(0xffd8d8d8));
         for (int y : { 48, 156 }) g.fillRect(0, y, getWidth(), 1);   // header separators
+
+        if (!brandBounds.isEmpty())
+        {
+            auto b = brandBounds;
+            const auto icon = b.removeFromLeft(b.getHeight()).reduced(2);
+            if (brandImage.isValid())
+                g.drawImage(brandImage, icon.toFloat(), juce::RectanglePlacement::centred);
+            g.setColour(juce::Colour(0xff12344d));
+            g.setFont(juce::Font(juce::FontOptions(26.0f, juce::Font::bold)));
+            g.drawText("CArp", b.withTrimmedLeft(6), juce::Justification::centredLeft);
+        }
     }
 
     void resized() override
     {
         auto r = getLocalBounds();
-        tabs.setBounds(r.removeFromTop(48));
+        auto header = r.removeFromTop(48);
+        brandBounds = header.removeFromRight(130).reduced(6, 5);
+        tabs.setBounds(header);
 
         auto row = [&r](int h) { auto a = r.removeFromTop(h).reduced(8, 3); return a; };
         {   auto a = row(32);   // MIDI out + mode
@@ -216,6 +227,9 @@ private:
     LinePage melody { store, engine, 0 }, harmony { store, engine, 1 }, bass { store, engine, 2 };
     PercussionPage percussion { store, engine };
 
+    juce::Image brandImage { juce::ImageCache::getFromMemory(BinaryData::carp_header_png, BinaryData::carp_header_pngSize) };
+    juce::Rectangle<int> brandBounds;
+
     std::unique_ptr<juce::FileChooser> chooser;     // must outlive the async dialog
     juce::File lastDir { juce::File::getSpecialLocation(juce::File::userDocumentsDirectory) };
 
@@ -224,13 +238,38 @@ private:
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, title, message);
     }
 
-    void savePreset()
+    // Asks whether to save unsaved changes, then runs `proceed` (unless the user cancels).
+    void confirmDiscard(std::function<void()> proceed)
+    {
+        if (!store.isDirty()) { proceed(); return; }
+        juce::Component::SafePointer<MainComponent> self(this);
+        const auto options = juce::MessageBoxOptions::makeOptionsYesNoCancel(
+            juce::MessageBoxIconType::QuestionIcon, "Save the current preset?",
+            "You have unsaved changes. Would you like to save them first?", "Save", "Don't Save", "Cancel", this);
+        juce::AlertWindow::showAsync(options, [self, proceed](int result) {
+            if (self == nullptr) return;
+            if (result == 1) self->savePreset(proceed);      // Save, then continue once the file is written
+            else if (result == 2) proceed();                 // Don't Save
+            // anything else: Cancel
+        });
+    }
+
+    void newPreset()
+    {
+        confirmDiscard([this] {
+            store.modify("", [](seq::Patch& p) { p = seq::makeDefaultPatch(); });   // undoable
+            bpmSlider.setValue(120.0);
+            store.markClean();
+        });
+    }
+
+    void savePreset(std::function<void()> onSaved = {})
     {
         chooser = std::make_unique<juce::FileChooser>("Save preset", lastDir.getChildFile("preset.json"), "*.json");
         juce::Component::SafePointer<MainComponent> self(this);
         chooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles
                                  | juce::FileBrowserComponent::warnAboutOverwriting,
-                             [self](const juce::FileChooser& fc) {
+                             [self, onSaved](const juce::FileChooser& fc) {
                                  if (self == nullptr) return;
                                  auto f = fc.getResult();
                                  if (f == juce::File()) return;                       // cancelled
@@ -238,11 +277,21 @@ private:
                                  self->lastDir = f.getParentDirectory();
                                  const auto text = juce::JSON::toString(PresetIO::toVar(self->store.get(), self->bpm.load()), false);
                                  if (!f.replaceWithText(text, false, false, "\n"))
+                                 {
                                      alert("Couldn't save preset", "Could not write to " + f.getFullPathName());
+                                     return;
+                                 }
+                                 self->store.markClean();
+                                 if (onSaved) onSaved();
                              });
     }
 
     void loadPreset()
+    {
+        confirmDiscard([this] { chooseAndLoad(); });
+    }
+
+    void chooseAndLoad()
     {
         chooser = std::make_unique<juce::FileChooser>("Load preset", lastDir, "*.json");
         juce::Component::SafePointer<MainComponent> self(this);
@@ -264,6 +313,7 @@ private:
 
                                  self->store.modify("", [loaded](seq::Patch& p) { p = loaded; });   // undoable
                                  self->bpmSlider.setValue(newBpm);
+                                 self->store.markClean();
                              });
     }
 
@@ -280,7 +330,7 @@ private:
     {
         const auto previous = midiBox.getText();
         midiBox.clear(juce::dontSendNotification);
-        midiBox.addItem("Virtual port \"Seq\"", 1);
+        midiBox.addItem("Virtual port \"CArp\"", 1);
         const auto& devs = midi.getDevices();
         int pick = 1;
         for (int i = 0; i < devs.size(); ++i)
@@ -305,10 +355,10 @@ private:
 };
 
 // ------------------------------------------------------------------------------------------ application
-class SeqApplication : public juce::JUCEApplication
+class CArpApplication : public juce::JUCEApplication
 {
 public:
-    const juce::String getApplicationName() override { return "Seq"; }
+    const juce::String getApplicationName() override { return "CArp"; }
     const juce::String getApplicationVersion() override { return "0.1.0"; }
     bool moreThanOneInstanceAllowed() override { return true; }
 
@@ -342,4 +392,4 @@ private:
     std::unique_ptr<MainWindow> window;
 };
 
-START_JUCE_APPLICATION(SeqApplication)
+START_JUCE_APPLICATION(CArpApplication)

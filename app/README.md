@@ -1,10 +1,10 @@
-# Seq (JUCE standalone), milestone 1: Melody + Bass pages
+# CArp (JUCE standalone)
 
 Build (macOS, needs CMake 3.22+ and Xcode; the first configure downloads JUCE 8.0.4):
 
     cd app
     cmake -B build -G Xcode
-    open build/SeqApp.xcodeproj      # or: cmake --build build --config Release
+    open build/CArp.xcodeproj      # or: cmake --build build --config Release
 
 The engine lives in ../seq (no JUCE dependency) and is tested separately:
 

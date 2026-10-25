@@ -47,14 +47,10 @@ public:
         addButton(">>", 36, [this] {
             editPart("", [](seq::PercPart& p) { if (!p.steps.empty()) std::rotate(p.steps.begin(), p.steps.end() - 1, p.steps.end()); });
         });
-        addButton("copy", 50, [this] {
-            store.modify("", [this](seq::Patch& p) {
-                auto& parts = p.perc.parts;
-                if (index < (int) parts.size() && (int) parts.size() < seq::kMaxParts)
-                {
-                    const seq::PercPart copy = parts[(size_t) index];
-                    parts.insert(parts.begin() + index + 1, copy);
-                }
+        addButton("copy", 50, [this] {   // duplicates the row: the steps are repeated once at the end of the row
+            editPart("", [](seq::PercPart& p) {
+                const auto copy = p.steps;
+                if (p.steps.size() + copy.size() <= 512) p.steps.insert(p.steps.end(), copy.begin(), copy.end());
             });
         });
     }

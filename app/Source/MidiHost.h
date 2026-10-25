@@ -25,7 +25,7 @@ public:
     bool open(int index)
     {
         std::unique_ptr<juce::MidiOutput> o;
-        if (index < 0) o = juce::MidiOutput::createNewDevice("Seq");
+        if (index < 0) o = juce::MidiOutput::createNewDevice("CArp");
         else if (juce::isPositiveAndBelow(index, devices.size())) o = juce::MidiOutput::openDevice(devices[index].identifier);
         if (o != nullptr) o->startBackgroundThread();
         {

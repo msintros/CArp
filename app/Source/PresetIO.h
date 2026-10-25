@@ -223,13 +223,13 @@ inline bool fromVar(const var& root, seq::Patch& out, double& bpm, juce::String&
 {
     if (!root.isObject() || root.getProperty("format", var()).toString() != "seq-preset")
     {
-        err = "This file isn't a Seq preset.";
+        err = "This file isn't a CArp preset.";
         return false;
     }
     const int version = getInt(root, "version", 0);
     if (version < 1 || version > kVersion)
     {
-        err = "This preset was saved by a different version of Seq (version " + juce::String(version) + ").";
+        err = "This preset was saved by a different version of CArp (version " + juce::String(version) + ").";
         return false;
     }
     const var pv = root.getProperty("patch", var());
