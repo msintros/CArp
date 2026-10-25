@@ -204,6 +204,7 @@ public:
             addFooter("remove row", 90, [this] {
                 edit("", [this](seq::Module<int>& m) {
                     if (m.rows.size() > 1 && currentRow < (int) m.rows.size()) m.rows.erase(m.rows.begin() + currentRow);
+                    else if (m.rows.size() == 1) m.rows[0] = std::vector<int>{ spec.defaultValue };   // last row: reset to default
                 });
             });
             addFooter("copy", 60, [this] {
